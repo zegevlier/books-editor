@@ -5,7 +5,6 @@ import Bookviewer from "~/components/book_viewer/book_viewer";
 
 export interface Props {
   input: string;
-  debouncedInput: string;
 }
 
 export default component$(() => {
@@ -18,19 +17,8 @@ export default component$(() => {
 Currently pixel-perfect to GUI scale 1, but looks wonky when scaled up. Will change to GUI scale 2!`;
   const state = useStore<Props>({
     input: defaultInput,
-    debouncedInput: defaultInput,
   });
 
-  useWatch$(({ track }) => {
-    // track changes in store.count
-    track(() => state.input);
-    const timer = setTimeout(() => {
-      state.debouncedInput = state.input;
-    }, 300);
-    return () => {
-      clearTimeout(timer);
-    };
-  });
 
   return (
     <div class="outer">
@@ -40,7 +28,7 @@ Currently pixel-perfect to GUI scale 1, but looks wonky when scaled up. Will cha
           <Inputbox state={state} />
         </div>
         <div class="split right">
-          <Bookviewer input={state.debouncedInput} />
+          <Bookviewer input={state.input} />
         </div>
       </div>
     </div>
