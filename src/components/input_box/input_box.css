@@ -3,13 +3,16 @@
 }
 
 textarea {
-    width: 90%;
-    height: 80%;
+    height: 80vh;
+    width: 40vw;
+    padding: 10px;
+    margin: 10px;
     border: none;
     padding: 10px;
     margin: 10px;
-    font-size: 16px;
+    font-size: 32px;
     resize: none;
-    outline: 2px solid #aaa;
-    background-color: #f1f1f1;
+    color: #fff;
+    background-color: #2c2f33;
+    border-radius: 10px;
 }

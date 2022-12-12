@@ -1,4 +1,4 @@
-import { component$, useStore, useWatch$ } from "@builder.io/qwik";
+import { component$, useStore } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 import Inputbox from "~/components/input_box/input_box";
 import Bookviewer from "~/components/book_viewer/book_viewer";
@@ -22,7 +22,9 @@ Currently pixel-perfect to GUI scale 1, but looks wonky when scaled up. Will cha
 
   return (
     <div class="outer">
-      <h1>Book editor!</h1>
+      <div>
+        <h1 class="rainbow">Book editor!</h1>
+      </div>
       <div id="main">
         <div class="split left">
           <Inputbox state={state} />

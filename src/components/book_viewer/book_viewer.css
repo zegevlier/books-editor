@@ -3,6 +3,5 @@ canvas {
     width: fit-content;
     padding: 10px;
     margin: 10px;
-    background-color: #f1f1f1;
     image-rendering: pixelated;
 }
