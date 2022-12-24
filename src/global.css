@@ -38,7 +38,7 @@ body {
     background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
     background-clip: text;
     color: transparent;
-    animation: rainbow_animation 6s linear infinite;
+    animation: rainbow_animation 3s linear infinite;
     background-size: 400% 100%;
 }
 

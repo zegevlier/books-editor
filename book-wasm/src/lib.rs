@@ -153,16 +153,14 @@ pub fn generate_image(font: String, text: String) -> Result<Uint8Array, JsValue>
 
     let mut placing_images = Vec::<PlacingImage>::new();
 
-    let mut start_of_line = true;
+    let mut words_on_line = 0;
     let mut color = Color::Black;
     let mut formats = Vec::<Format>::new();
-    let mut next_is_modifier;
 
     for word in words {
         let mut word = format!("{} ", word);
 
         let mut first_try = true;
-        next_is_modifier = false;
 
         'word: loop {
             if y > MAX_HEIGHT {
@@ -174,44 +172,46 @@ pub fn generate_image(font: String, text: String) -> Result<Uint8Array, JsValue>
 
             let mut splitting_word_index: Option<usize> = None;
 
-            for (i, c) in word.chars().enumerate() {
-                if c == '§' {
-                    next_is_modifier = true;
-                    continue;
-                }
-                if next_is_modifier {
-                    if c == 'r' {
+            let mut chars_enum = word.chars().enumerate().peekable();
+
+            while let Some((i, c)) = chars_enum.next() {
+                if c == '§' || c == '&' {
+                    let next_char = chars_enum.peek();
+                    if next_char.is_none() {
+                        break;
+                    }
+                    let next_char = next_char.unwrap().1;
+                    if next_char == 'r' {
                         color = Color::Black;
                         formats.clear();
+                        chars_enum.next();
+                        continue;
                     }
-                    if let Some(new_color) = Color::from_color_code(c) {
+                    if let Some(new_color) = Color::from_color_code(next_char) {
                         color = new_color;
                         formats.clear();
+                        chars_enum.next();
+                        continue;
                     }
-                    if let Some(new_format) = Format::from_format_code(c) {
+                    if let Some(new_format) = Format::from_format_code(next_char) {
                         formats.push(new_format);
+                        chars_enum.next();
+                        continue;
                     }
-
-                    next_is_modifier = false;
-                    continue;
                 }
                 if c == '\n' {
                     x = X_MIN;
                     y += Y_STEP;
-                    start_of_line = true;
+                    words_on_line = -1;
                     break;
                 }
-                let char_data = font_data.chars.get(&c).unwrap_or_else(|| {
-                    font_data.chars.get(&char::from_u32(0x00).unwrap()).unwrap()
-                });
+                let char_data = font_data
+                    .chars
+                    .get(&c)
+                    .unwrap_or_else(|| font_data.chars.get(&'\0').unwrap());
 
                 if char_data.image.is_none() {
-                    word_width += char_data.pos.2
-                        + if formats.contains(&Format::Bold) {
-                            1
-                        } else {
-                            0
-                        };
+                    word_width += char_data.pos.2 + u32::from(formats.contains(&Format::Bold));
                     continue;
                 }
 
@@ -220,7 +220,7 @@ pub fn generate_image(font: String, text: String) -> Result<Uint8Array, JsValue>
                     if first_try {
                         first_try = false;
                         x = X_MIN;
-                        if !start_of_line {
+                        if words_on_line != 0 {
                             y += Y_STEP;
                         }
                         continue 'word;
@@ -237,16 +237,10 @@ pub fn generate_image(font: String, text: String) -> Result<Uint8Array, JsValue>
                     color,
                     formats: formats.clone(),
                 });
-                word_width += char_data.pos.2
-                    + 1
-                    + if formats.contains(&Format::Bold) {
-                        1
-                    } else {
-                        0
-                    };
-                start_of_line = false;
+                word_width += char_data.pos.2 + 1 + u32::from(formats.contains(&Format::Bold));
             }
 
+            words_on_line += 1;
             x += word_width;
             placing_images.append(&mut word_placing);
             if let Some(swi) = splitting_word_index {

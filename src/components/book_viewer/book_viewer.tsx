@@ -28,7 +28,7 @@ export default component$((props: { input: string }) => {
 
     if (font.font === "") return;
 
-    const image_bytes = generate_image(font.font, props.input.replaceAll("&", "§"));
+    const image_bytes = generate_image(font.font, props.input);
     const canvas = (
       document.getElementById("book-img") as HTMLCanvasElement
     ).getContext("2d");
